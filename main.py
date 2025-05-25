@@ -19,14 +19,28 @@ def get_usd_rate():
             cash_buy = float(cols[1].text.strip())
             cash_sell = float(cols[2].text.strip())
             suggested_price = round(cash_sell + 0.35, 3)
+
+            # 加入 USDT 報價
+            usdt_price = get_usdt_price()
+
             return (
                 f"【台灣銀行美金匯率】\n"
                 f"買入：{cash_buy}\n"
                 f"賣出：{cash_sell}\n\n"
                 f"賣出價格：{suggested_price}\n"
+                f"USDT 最新價格：NT$ {usdt_price}\n"
                 f"資料時間：{rate_time}\n"
                 f"「本匯率報價機器人僅供參考」"
             )
+
+def get_usdt_price():
+    try:
+        res = requests.get('https://max-api.maicoin.com/api/v2/tickers/usdt_twd')
+        data = res.json()
+        price = data['ticker']['last']
+        return round(float(price), 3)
+    except Exception as e:
+        return '無法取得'
 
 def send_to_telegram(text):
     token = os.getenv('TELEGRAM_TOKEN')
@@ -37,5 +51,5 @@ def send_to_telegram(text):
 
 if __name__ == "__main__":
     msg = get_usd_rate()
-    print(msg)  # 除錯用，可移除
+    print(msg)  # 可保留除錯用
     send_to_telegram(msg)
