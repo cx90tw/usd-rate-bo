@@ -2,7 +2,7 @@ name: Daily USD Rate to Telegram
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 台灣早上 9 點（UTC+0 時區）
+    - cron: '5 3 * * *'  # 台灣早上 9 點（UTC+0 時區）
   workflow_dispatch:     # 允許手動執行
 
 jobs:
