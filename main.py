@@ -6,15 +6,27 @@ def get_usd_rate():
     url = 'https://rate.bot.com.tw/xrt?Lang=zh-TW'
     res = requests.get(url)
     soup = BeautifulSoup(res.text, 'html.parser')
+
+    # 擷取報價時間
+    time_tag = soup.select_one('span.time')
+    rate_time = time_tag.text.strip() if time_tag else '無法取得報價時間'
+
+    # 擷取美金匯率
     rows = soup.select('table.table tbody tr')
     for row in rows:
         if 'USD' in row.text:
             cols = row.find_all('td')
-            cash_buy = cols[1].text.strip()
-            cash_sell = cols[2].text.strip()
-            spot_buy = cols[3].text.strip()
-            spot_sell = cols[4].text.strip()
-            return f"【台灣銀行美金匯率】\n現金買入：{cash_buy}\n現金賣出：{cash_sell}\n即期買入：{spot_buy}\n即期賣出：{spot_sell}"
+            cash_buy = float(cols[1].text.strip())
+            cash_sell = float(cols[2].text.strip())
+            suggested_price = round(cash_sell + 0.35, 3)
+            return (
+                f"【台灣銀行美金匯率】\n"
+                f"買入：{cash_buy}\n"
+                f"賣出：{cash_sell}\n\n"
+                f"賣出價格：{suggested_price}\n"
+                f"資料時間：{rate_time}\n"
+                f"「本匯率報價機器人僅供參考」"
+            )
 
 def send_to_telegram(text):
     token = os.getenv('TELEGRAM_TOKEN')
@@ -25,4 +37,5 @@ def send_to_telegram(text):
 
 if __name__ == "__main__":
     msg = get_usd_rate()
+    print(msg)  # 除錯用，可移除
     send_to_telegram(msg)
