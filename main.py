@@ -63,7 +63,7 @@ def get_usd_rate():
 
             # 衍生價格計算
             t_u = round(spot_avg * 1.0205, 2)
-            u_t = round(spot_avg * 1, 2)
+            u_t = round(spot_avg * 0.9867, 2)
             r_u = round(boc_avg * 1.022, 2)
 
             return (
