@@ -62,9 +62,9 @@ def get_usd_rate():
             boc_avg = round((boc_cash_buy + boc_cash_sell) / 2, 3)
 
             # 衍生價格計算
-            t_u = round(spot_avg * 1.02, 3)
-            u_t = round(spot_avg * 0.98, 3)
-            r_u = round(boc_avg * 1.022, 3)
+            t_u = round(spot_avg * 1.021, 2)
+            u_t = round(spot_avg * 0.98, 2)
+            r_u = round(boc_avg * 1.022, 2)
 
             return (
                 f"【台灣銀行美金匯率】\n"
