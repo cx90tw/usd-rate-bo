@@ -10,7 +10,7 @@ def get_boc_usd_cash_rates():
     soup = BeautifulSoup(res.text, 'html.parser')
 
     # 預設系統時間（若抓不到發布時間）
-    boc_time = datetime.now().strftime("%Y/%m/%d %H:%M") + "（系統時間）"
+    boc_time = datetime.now().strftime("%Y/%m/%d %H:%M")
 
     # 嘗試抓取「发布时间」
     text_block = soup.get_text()
@@ -21,7 +21,7 @@ def get_boc_usd_cash_rates():
                 parts = line.replace("发布时间：", "").strip().split()
                 date_part = parts[0].replace("-", "/")
                 time_part = parts[1][:5] if len(parts) > 1 else "00:00"
-                boc_time = f"{date_part} {time_part}（中國銀行發布時間）"
+                boc_time = f"{date_part} {time_part}"
             except Exception:
                 pass
             break
@@ -70,17 +70,17 @@ def get_usd_rate():
                 f"【台灣銀行美金匯率】\n"
                 f"買入：{cash_buy:.2f}　 {spot_buy:.2f}\n"
                 f"賣出：{cash_sell:.2f}　 {spot_sell:.2f}\n"
-                f"資料時間：{twb_time}\n\n"
+                f"📅時間：{twb_time}\n\n"
                 f"【中國銀行美金匯率】\n"
                 f"買入：{boc_cash_buy:.2f}\n"
                 f"賣出：{boc_cash_sell:.2f}\n"
-                f"資料時間：{boc_time}\n\n"
-                f"===============\n"
+                f"📅時間：{boc_time}\n\n"
+                f"=====================\n"
                 f"新台幣-USDT：{t_u}\n"
                 f"USDT-新台幣：{u_t}\n"
                 f"人民幣-USDT：{r_u}\n"
-                f"===============\n"
-                f"「本匯率僅供參考，非絕對」"
+                f"=====================\n"
+                f"⚠️本匯率僅供參考，非絕對⚠️"
             )
 
 def send_to_telegram(text):
