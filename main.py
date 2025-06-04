@@ -9,17 +9,24 @@ def get_boc_usd_cash_rates():
     res.encoding = 'utf-8'
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    # 擷取中國銀行發布時間
-    publish_text = soup.get_text()
-    boc_time = "無法取得"
-    for line in publish_text.splitlines():
-        if "发布时间：" in line:
-            date_part = line.strip().replace("发布时间：", "").split()[0].replace("-", "/")
-            time_part = line.strip().split()[-1][:5]
-            boc_time = f"{date_part} {time_part}"
+    # 預設系統時間（若抓不到發布時間）
+    boc_time = datetime.now().strftime("%Y/%m/%d %H:%M") + "（系統時間）"
+
+    # 嘗試抓取「发布时间」
+    text_block = soup.get_text()
+    for line in text_block.splitlines():
+        line = line.strip()
+        if line.startswith("发布时间："):
+            try:
+                parts = line.replace("发布时间：", "").strip().split()
+                date_part = parts[0].replace("-", "/")
+                time_part = parts[1][:5] if len(parts) > 1 else "00:00"
+                boc_time = f"{date_part} {time_part}（中國銀行發布時間）"
+            except Exception:
+                pass
             break
 
-    # 擷取美元現鈔買入與賣出價格（人民幣/100 美元）
+    # 擷取美元現鈔匯率
     table = soup.find('table', attrs={'align': 'left'})
     rows = table.find_all('tr')
 
@@ -29,6 +36,7 @@ def get_boc_usd_cash_rates():
             cash_buy = float(cols[1].text.strip()) / 100
             cash_sell = float(cols[3].text.strip()) / 100
             return cash_buy, cash_sell, boc_time
+
     return None, None, boc_time
 
 def get_usd_rate():
@@ -36,7 +44,7 @@ def get_usd_rate():
     res = requests.get(url)
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    # 明確指定台灣銀行官方時間（也可擴充為自動擷取）
+    # 指定台灣銀行官方掛牌時間（可改為自動抓）
     twb_time = "2025/06/05 03:02"
 
     rows = soup.select('table.table tbody tr')
@@ -49,16 +57,15 @@ def get_usd_rate():
             spot_sell = float(cols[4].text.strip())
             spot_avg = round((spot_buy + spot_sell) / 2, 3)
 
-            # 擷取中國銀行資料
+            # 擷取中國銀行數據
             boc_cash_buy, boc_cash_sell, boc_time = get_boc_usd_cash_rates()
             boc_avg = round((boc_cash_buy + boc_cash_sell) / 2, 3)
 
-            # 衍生匯率計算
+            # 衍生價格計算
             t_u = round(spot_avg * 1.02, 3)
             u_t = round(spot_avg * 0.98, 3)
             r_u = round(boc_avg * 1.022, 3)
 
-            # 輸出格式
             return (
                 f"【台灣銀行美金匯率】\n"
                 f"買入：{cash_buy:.2f}　 {spot_buy:.2f}\n"
@@ -88,8 +95,8 @@ def send_to_telegram(text):
 if __name__ == "__main__":
     try:
         msg = get_usd_rate()
+        print("📬 實際發送內容：\n", msg)
         if msg:
-            print(msg)
             send_to_telegram(msg)
         else:
             print("⚠️ 匯率資料抓取失敗")
