@@ -2,6 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from datetime import datetime
+import pytz  # 加入時區處理
+
+# 取得台灣時間
+def now_taipei():
+    return datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y/%m/%d %H:%M")
 
 def get_boc_usd_cash_rates():
     url = 'https://www.boc.cn/sourcedb/whpj/'
@@ -9,8 +14,8 @@ def get_boc_usd_cash_rates():
     res.encoding = 'utf-8'
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    # 預設系統時間（若抓不到發布時間）
-    boc_time = datetime.now().strftime("%Y/%m/%d %H:%M")
+    # 預設台灣時間（若抓不到發布時間）
+    boc_time = now_taipei()
 
     # 嘗試抓取「发布时间」
     text_block = soup.get_text()
@@ -44,8 +49,9 @@ def get_usd_rate():
     res = requests.get(url)
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    # 指定台灣銀行官方掛牌時間（可改為自動抓）
-    twb_time = "2025/06/05 03:02"
+    # 擷取台灣銀行官方掛牌時間
+    time_tag = soup.select_one('span.time')
+    twb_time = time_tag.text.strip() if time_tag else now_taipei()
 
     rows = soup.select('table.table tbody tr')
     for row in rows:
@@ -70,11 +76,11 @@ def get_usd_rate():
                 f"【台灣銀行美金匯率】\n"
                 f"買入：{cash_buy:.2f}　 {spot_buy:.2f}\n"
                 f"賣出：{cash_sell:.2f}　 {spot_sell:.2f}\n"
-                f"📅時間：{twb_time}\n\n"
+                f"🕙時間：{twb_time}\n\n"
                 f"【中國銀行美金匯率】\n"
                 f"買入：{boc_cash_buy:.2f}\n"
                 f"賣出：{boc_cash_sell:.2f}\n"
-                f"📅時間：{boc_time}\n\n"
+                f"🕙時間：{boc_time}\n\n"
                 f"=====================\n"
                 f"新台幣-USDT：{t_u}\n"
                 f"USDT-新台幣：{u_t}\n"
@@ -94,6 +100,7 @@ def send_to_telegram(text):
 
 if __name__ == "__main__":
     try:
+        print("🕙 實際發送時間（台灣）：", now_taipei())
         msg = get_usd_rate()
         print("📬 實際發送內容：\n", msg)
         if msg:
