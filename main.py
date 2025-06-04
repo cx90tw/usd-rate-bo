@@ -62,8 +62,8 @@ def get_usd_rate():
             boc_avg = round((boc_cash_buy + boc_cash_sell) / 2, 3)
 
             # 衍生價格計算
-            t_u = round(spot_avg * 1.021, 2)
-            u_t = round(spot_avg * 0.98, 2)
+            t_u = round(spot_avg * 1.0205, 2)
+            u_t = round(spot_avg * 1, 2)
             r_u = round(boc_avg * 1.022, 2)
 
             return (
@@ -76,7 +76,7 @@ def get_usd_rate():
                 f" ===============\n"
                 f" 新台幣-USDT：{t_u}\n"
                 f" USDT-新台幣：{u_t}\n"
-                f" 人民幣-USDT：{r_u}\n"
+                f" 人民幣-USDT： {r_u}\n"
                 f" ===============\n"
                 f"🕙{twb_time}\n"
                 f"⚠️本匯率僅供參考，非絕對⚠️"
