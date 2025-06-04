@@ -14,8 +14,8 @@ def get_boc_usd_cash_rates():
     for row in rows:
         cols = row.find_all('td')
         if len(cols) >= 6 and '美元' in cols[0].text:
-            cash_buy = float(cols[1].text.strip())
-            cash_sell = float(cols[3].text.strip())
+            cash_buy = float(cols[1].text.strip()) / 100  # 除以100得到每1美元
+            cash_sell = float(cols[3].text.strip()) / 100  # 除以100得到每1美元
             return cash_buy, cash_sell
     return None, None
 
@@ -28,7 +28,7 @@ def get_usd_rate():
     time_tag = soup.select_one('span.time')
     rate_time = time_tag.text.strip() if time_tag else '無法取得報價時間'
 
-    # 擷取台銀美金匯率
+    # 擷取台灣銀行美金匯率
     rows = soup.select('table.table tbody tr')
     for row in rows:
         if 'USD' in row.text:
@@ -49,18 +49,17 @@ def get_usd_rate():
 
             return (
                 f"【台灣銀行美金匯率】\n"
-                f"買入：{cash_buy}\n"
-                f"賣出：{cash_sell}\n"
-                f"均價：{spot_avg}\n\n"
+                f"買入：{cash_buy}　{spot_buy}\n"
+                f"賣出：{cash_sell}　{spot_sell}\n\n"
                 f"【中國銀行美金匯率】\n"
-                f"賣出：{boc_cash_sell}\n"
-                f"買入：{boc_cash_buy}\n\n"
+                f"買入：{boc_cash_buy}\n"
+                f"賣出：{boc_cash_sell}\n\n"
                 f"===============\n"
-                f"TWD-USDT：{twd_usdt}\n"
-                f"USDT-TWD：{usdt_twd}\n"
-                f"CNY-USDT：{cny_usdt}\n"
+                f"Ｔ－Ｕ：{twd_usdt}\n"
+                f"Ｕ－Ｔ：{usdt_twd}\n"
+                f"Ｒ－Ｕ：{cny_usdt}\n"
                 f"===============\n\n"
-                f"本匯率僅供參考使用\n"
+                f"「本匯率僅供參考」\n"
                 f"資料時間：{rate_time}\n"
             )
 
