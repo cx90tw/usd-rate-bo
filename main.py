@@ -73,13 +73,13 @@ def get_usd_rate():
                 f"【中國銀行美金匯率】\n"
                 f"買入：{boc_cash_buy:.2f}\n"
                 f"賣出：{boc_cash_sell:.2f}\n\n"
-                f"===============\n"
-                f"新台幣-USDT：{t_u}\n"
-                f"USDT-新台幣：{u_t}\n"
-                f"人民幣-USDT：{r_u}\n"
-                f"===============\n"
-                f"資料時間：{twb_time}\n"
-                f"「本匯率僅供參考，非絕對」"
+                f" ===============\n"
+                f" 新台幣-USDT：{t_u}\n"
+                f" USDT-新台幣：{u_t}\n"
+                f" 人民幣-USDT：{r_u}\n"
+                f" ===============\n"
+                f"🕙{twb_time}\n"
+                f"⚠️本匯率僅供參考，非絕對⚠️"
             )
 
 def send_to_telegram(text):
